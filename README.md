@@ -16,6 +16,11 @@ Although Vietcombank and Vietinbank had a quite low rate of NIM compared other b
 
 Plot 3 section showed NPL of top banks during the period. In general, NPL ratio for all banks decreased. Especially in two countries including Techcombank and Vietcombank had both an significant decrease in this ratio. Techcombank completed well in the task of non-performing debts management from 2013 to 2020, and slightly increase after that. It was easily seen from the chart, VPbank had some issues with debt performance from 2020 to 2022. When seen in the chart of NIM, VPbank experienced a plunge in this period. 
 
+Plot 4 indicated that CAR of 5 banks fluctuated and did not show the exact trend over the period. In general, 5 banks kept the minimum of the ratio which is 8% according to Basel II. It is only VIB whose ratio increased considerably from 2015 to 2019 and Vietinbank from 2017 to 2022 broke the minimum rate, which was under 8%. 
+
+
+
+
 
 
 

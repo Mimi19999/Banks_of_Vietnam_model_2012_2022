@@ -122,3 +122,36 @@ print(pivot_name)
 # plt.tight_layout()
 # plt.show()
 
+# Plot 4
+# name_filter = ['Tech', 'VIB', 'VP', 'Vietcom', 'Vietin']
+
+# # Filter the DataFrame for multiple names
+# filtered_df = df[df['Name'].isin(name_filter)]
+
+# # Configure the plot
+# colors = ['red', 'blue', 'green', 'coral', 'brown']
+
+# # Create the line graph
+# fig, ax = plt.subplots()
+
+# for i, name in enumerate(name_filter):
+#     name_df = filtered_df[filtered_df['Name'] == name]
+#     years = name_df['Year'].tolist()
+#     nim_values = name_df['CAR'].tolist()
+#     ax.plot(years, nim_values, color=colors[i], label=name, marker='o', markersize=5, linewidth=2)
+
+# # Add labels and title
+# ax.set_xlabel('Year')
+# ax.set_ylabel('CAR %')
+# ax.set_title('CAR for top banks')
+
+# # Add legend
+# ax.legend()
+
+# # Display the chart
+# plt.tight_layout()
+# plt.show()
+
+
+
+
