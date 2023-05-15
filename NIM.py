@@ -7,16 +7,20 @@ import matplotlib.pyplot as plt
 df = pd.read_excel('/Users/mimi/Documents/Tech_data.xlsx', sheet_name='Data', usecols=('Name', 'Year','Earning_asset',
                     'Net_revenue', 'NPL', 'CAR', 'Credit_insti_lending', 'Credit_insti_allowance','Cust_lending','Cust_allowance',
                     'Operating_cost', 'Total_asset', 'GDP', 'CPI'))
-print(df)
 
-# Count missing data
-missing_data = df.isna().sum()
-print(missing_data)
+df[['CPI', 'GDP']] = df[['CPI', 'GDP']]/100
+
+
 
 # Insert some new columns
 df['NIM'] = df['Net_revenue']/df['Earning_asset']
 df['Credit_risk'] = (df['Credit_insti_allowance'] + df['Cust_allowance'])/(df['Credit_insti_lending'] + df['Cust_lending'])
 df['OCR'] = df['Operating_cost']/df['Total_asset']
+
+# Count missing data
+missing_data = df.isna().sum()
+print(missing_data)
+
 
 # Pivot table
 pivot_year = pd.pivot_table(df,
@@ -38,7 +42,7 @@ print(pivot_name)
 # plt.figure(figsize=(16, 8))
 # plt.plot(x, y, marker='o', markersize=10, linestyle='-.', linewidth=2)
 # plt.xlabel('Year', fontsize=16)
-# plt.ylabel('%NIM', fontsize=16)
+# plt.ylabel('NIM', fontsize=16)
 # plt.title("Average of NIM by year", fontsize=18)
 # plt.show()
 
@@ -48,7 +52,7 @@ print(pivot_name)
 # plt.figure(figsize=(16, 8))
 # plt.plot(x1, y1, marker='o', markersize=10, linestyle='-.', linewidth=2)
 # plt.xlabel('Year', fontsize=16)
-# plt.ylabel('%CPI', fontsize=16)
+# plt.ylabel('CPI', fontsize=16)
 # plt.title("CPI by year", fontsize=18)
 # plt.show()
 
@@ -58,7 +62,7 @@ print(pivot_name)
 # plt.figure(figsize=(16, 8))
 # plt.plot(x1, y1, marker='o', markersize=10, linestyle='-.', linewidth=2)
 # plt.xlabel('Year', fontsize=16)
-# plt.ylabel('%GDP', fontsize=16)
+# plt.ylabel('GDP', fontsize=16)
 # plt.title("GDP by year", fontsize=18)
 # plt.show()
 
@@ -82,7 +86,7 @@ print(pivot_name)
 
 # # Add labels and title
 # ax.set_xlabel('Year')
-# ax.set_ylabel('NIM %')
+# ax.set_ylabel('NIM')
 # ax.set_title('NIM for top banks')
 
 # # Add legend
@@ -112,7 +116,7 @@ print(pivot_name)
 
 # # Add labels and title
 # ax.set_xlabel('Year')
-# ax.set_ylabel('NPL %')
+# ax.set_ylabel('NPL')
 # ax.set_title('NPL for top banks')
 
 # # Add legend
@@ -142,7 +146,7 @@ print(pivot_name)
 
 # # Add labels and title
 # ax.set_xlabel('Year')
-# ax.set_ylabel('CAR %')
+# ax.set_ylabel('CAR')
 # ax.set_title('CAR for top banks')
 
 # # Add legend
@@ -151,6 +155,89 @@ print(pivot_name)
 # # Display the chart
 # plt.tight_layout()
 # plt.show()
+
+
+# # Independent variables distribution
+# import matplotlib.pyplot as plt
+# import seaborn as sns
+
+# # Independent variables list
+# inde_cols = df[['NPL', 'CAR', 'GDP', 'CPI', 'OCR']].columns
+
+# # Grid layout
+# row = 2
+# col = 3
+
+# # Grid layout subplot
+# fig, axes = plt.subplots(row, col, figsize=(12, 8))
+
+# # Histogram
+# for i, col_name in enumerate(inde_cols):
+#     ax = axes[i // col, i % col]
+#     sns.histplot(data=df, x=col_name, kde=True, ax=ax)
+
+# # Delete an empty chart
+# if len(inde_cols) % col != 0:
+#     fig.delaxes(axes.flatten()[-1])
+
+# # Plot 5
+# plt.tight_layout()
+# plt.show()
+
+# Correlation between independent variables
+corr_matrix =  df[['NPL', 'CAR', 'GDP', 'CPI', 'OCR']].corr()
+print(corr_matrix)
+
+# Choosing hyperparameters
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+from sklearn.model_selection import PredefinedSplit
+from sklearn.model_selection import train_test_split, KFold, GridSearchCV
+from sklearn.linear_model import Lasso, Ridge
+from sklearn.impute import SimpleImputer
+
+# Split dataset
+X = df[['NPL', 'CAR', 'GDP', 'CPI', 'OCR']]
+X_imputed = X.fillna(X.mean())
+X_imputed_array = X_imputed.values
+print(X_imputed_array)
+
+y = df['NIM']
+y_imputed = y.fillna(y.mean())
+y_imputed_array = y_imputed.values
+print(y_imputed_array)
+
+idx = np.arange(X_imputed_array.shape[0])
+X_train, X_test, y_train, y_test, idx_train, idx_test = train_test_split(X_imputed_array, y_imputed_array, idx, test_size=0.33, random_state=42)
+
+# Mark train_data as -1 and mark test_data as 0
+split_index = [-1 if i in idx_train else 0 for i in idx]
+ps = PredefinedSplit(test_fold=split_index)
+
+# Pipeline
+pipeline = Pipeline([
+                     ('scaler', StandardScaler()),
+                     ('model', Ridge())
+])
+# GridSearch
+search = GridSearchCV(pipeline,
+                      {'model__alpha':np.arange(1, 10, 1)}, # Tham số alpha từ 1->10 huấn luyện mô hình
+                      cv = ps, # validation trên tập kiểm tra
+                      scoring="neg_mean_squared_error", # trung bình tổng bình phương phần dư
+                      verbose=3
+                      )
+search.fit(X_imputed_array, y_imputed_array)
+print(search.best_estimator_)
+print('Best core: ', search.best_score_)
+
+
+reg_ridge = Ridge(alpha = 1)
+reg_ridge.fit(X_train, y_train)
+print(reg_ridge.score(X_train, y_train))
+print(reg_ridge.coef_)
+print(reg_ridge.intercept_)
+
+
 
 
 
