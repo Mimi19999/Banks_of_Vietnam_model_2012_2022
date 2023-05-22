@@ -14,12 +14,15 @@ df[['CPI', 'GDP']] = df[['CPI', 'GDP']]/100
 
 # Insert some new columns
 df['NIM'] = df['Net_revenue']/df['Earning_asset']
+print(df['NIM'][0])
 df['Credit_risk'] = (df['Credit_insti_allowance'] + df['Cust_allowance'])/(df['Credit_insti_lending'] + df['Cust_lending'])
 df['OCR'] = df['Operating_cost']/df['Total_asset']
 
 # Count missing data
 missing_data = df.isna().sum()
 print(missing_data)
+
+
 
 
 # Pivot table
@@ -35,8 +38,8 @@ pivot_name = pd.pivot_table(df,
                        aggfunc=np.mean)
 print(pivot_name)
 
-# Plot 1
-# Year_NIM
+# # Plot 1
+# # Year_NIM
 # df_summary_year = df[['Year', 'NIM']].groupby('Year').mean()
 # x, y = list(df_summary_year.index), df_summary_year['NIM'].values
 # plt.figure(figsize=(16, 8))
@@ -185,7 +188,7 @@ print(pivot_name)
 # plt.show()
 
 # Correlation between independent variables
-corr_matrix =  df[['NPL', 'CAR', 'GDP', 'CPI', 'OCR']].corr()
+corr_matrix =  df[['NPL', 'CAR', 'GDP', 'CPI', 'OCR', 'Credit_risk', 'NIM']].corr()
 print(corr_matrix)
 
 # Choosing hyperparameters
@@ -194,48 +197,70 @@ from sklearn.pipeline import Pipeline
 from sklearn.model_selection import PredefinedSplit
 from sklearn.model_selection import train_test_split, KFold, GridSearchCV
 from sklearn.linear_model import Lasso, Ridge
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
 from sklearn.impute import SimpleImputer
 
 # Split dataset
-X = df[['NPL', 'CAR', 'GDP', 'CPI', 'OCR']]
-X_imputed = X.fillna(X.mean())
-X_imputed_array = X_imputed.values
-print(X_imputed_array)
+X = df[['NPL', 'CAR', 'GDP', 'CPI', 'OCR', 'Credit_insti_lending', 'Cust_lending',
+        'Cust_allowance', 'Credit_insti_allowance', 'Operating_cost', 'Total_asset', 'Credit_risk' ]]
 
 y = df['NIM']
-y_imputed = y.fillna(y.mean())
-y_imputed_array = y_imputed.values
-print(y_imputed_array)
 
-idx = np.arange(X_imputed_array.shape[0])
-X_train, X_test, y_train, y_test, idx_train, idx_test = train_test_split(X_imputed_array, y_imputed_array, idx, test_size=0.33, random_state=42)
+idx = np.arange(X.shape[0])
+X_train, X_test, y_train, y_test, idx_train, idx_test = train_test_split(X, y, idx, test_size=0.33, random_state=42)
 
-# Mark train_data as -1 and mark test_data as 0
-split_index = [-1 if i in idx_train else 0 for i in idx]
-ps = PredefinedSplit(test_fold=split_index)
+# # Mark train_data as -1 and mark test_data as 0
+# split_index = [-1 if i in idx_train else 0 for i in idx]
+# ps = PredefinedSplit(test_fold=split_index)
 
-# Pipeline
-pipeline = Pipeline([
-                     ('scaler', StandardScaler()),
-                     ('model', Ridge())
-])
-# GridSearch
-search = GridSearchCV(pipeline,
-                      {'model__alpha':np.arange(1, 10, 1)}, # Tham số alpha từ 1->10 huấn luyện mô hình
-                      cv = ps, # validation trên tập kiểm tra
-                      scoring="neg_mean_squared_error", # trung bình tổng bình phương phần dư
-                      verbose=3
-                      )
-search.fit(X_imputed_array, y_imputed_array)
-print(search.best_estimator_)
-print('Best core: ', search.best_score_)
+# # Pipeline
+# pipeline = Pipeline([
+#                      ('scaler', StandardScaler()),
+#                      ('model', Ridge())
+# ])
+# # GridSearch
+# search = GridSearchCV(pipeline,
+#                       {'model__alpha':np.arange(1, 10, 1)}, # Tham số alpha từ 1->10 huấn luyện mô hình
+#                       cv = ps, # validation trên tập kiểm tra
+#                       scoring="neg_mean_squared_error", # trung bình tổng bình phương phần dư
+#                       verbose=3
+#                       )
+# search.fit(X, y)
+# print(search.best_estimator_)
+# print('Best core: ', search.best_score_)
 
+# reg_ridge = Ridge(alpha = 1)
+# reg_ridge.fit(X_train, y_train)
+# print(reg_ridge.score(X_train, y_train))
+# print(reg_ridge.coef_)
+# print(reg_ridge.intercept_)
 
-reg_ridge = Ridge(alpha = 1)
-reg_ridge.fit(X_train, y_train)
-print(reg_ridge.score(X_train, y_train))
-print(reg_ridge.coef_)
-print(reg_ridge.intercept_)
+# plt.scatter(x=df['Credit_risk'], y=df["NIM"])
+# plt.show()
+
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Create and train the linear regression model
+model = LinearRegression()
+model.fit(X_train_scaled, y_train)
+
+# Scale the input for prediction
+X_test_scaled = scaler.transform(X_test)
+
+# Make predictions on the test set
+y_pred = model.predict(X_test_scaled)
+
+# Evaluate the model
+mse = mean_squared_error(y_test, y_pred)
+rmse = np.sqrt(mse)
+r_squared = model.score(X_test_scaled, y_test)
+print(r_squared)
+
+    
+
 
 
 
