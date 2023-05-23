@@ -198,7 +198,8 @@ from sklearn.model_selection import PredefinedSplit
 from sklearn.model_selection import train_test_split, KFold, GridSearchCV
 from sklearn.linear_model import Lasso, Ridge
 from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_squared_error, r2_score, accuracy_score
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.impute import SimpleImputer
 
 # Split dataset
@@ -217,7 +218,7 @@ X_train, X_test, y_train, y_test, idx_train, idx_test = train_test_split(X, y, i
 # # Pipeline
 # pipeline = Pipeline([
 #                      ('scaler', StandardScaler()),
-#                      ('model', Ridge())
+#                      ('model', Lasso())
 # ])
 # # GridSearch
 # search = GridSearchCV(pipeline,
@@ -230,7 +231,7 @@ X_train, X_test, y_train, y_test, idx_train, idx_test = train_test_split(X, y, i
 # print(search.best_estimator_)
 # print('Best core: ', search.best_score_)
 
-# reg_ridge = Ridge(alpha = 1)
+# reg_ridge = Lasso(alpha = 1)
 # reg_ridge.fit(X_train, y_train)
 # print(reg_ridge.score(X_train, y_train))
 # print(reg_ridge.coef_)
@@ -259,7 +260,21 @@ rmse = np.sqrt(mse)
 r_squared = model.score(X_test_scaled, y_test)
 print(r_squared)
 
-    
+# Random Forest
+model = RandomForestRegressor(n_estimators=3, random_state=0)
+model.fit(X_train_scaled, y_train)
+
+# Test
+y_pred_test = model.predict(X_test_scaled)
+y_pred_train = model.predict(X_train_scaled)
+
+# Evaluate
+mse_test = mean_squared_error(y_test, y_pred_test)
+print(mse_test)
+mse_train = mean_squared_error(y_train, y_pred_train)
+print(mse_train)
+r2 = r2_score(y_test, y_pred_test)
+print(r2)
 
 
 
