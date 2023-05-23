@@ -261,7 +261,7 @@ r_squared = model.score(X_test_scaled, y_test)
 print(r_squared)
 
 # Random Forest
-model = RandomForestRegressor(n_estimators=3, random_state=0)
+model = RandomForestRegressor(n_estimators=12, random_state=0, max_depth=None, min_samples_split=2)
 model.fit(X_train_scaled, y_train)
 
 # Test
@@ -275,6 +275,16 @@ mse_train = mean_squared_error(y_train, y_pred_train)
 print(mse_train)
 r2 = r2_score(y_test, y_pred_test)
 print(r2)
+
+# Get the feature importances
+feature_importances = model.feature_importances_
+
+# Create a dataframe to display feature importances
+importance_df = pd.DataFrame({'Feature': X.columns, 'Importance': feature_importances})
+importance_df = importance_df.sort_values(by='Importance', ascending=False)
+
+# Print feature importances
+print(importance_df)
 
 
 
