@@ -286,9 +286,14 @@ importance_df = importance_df.sort_values(by='Importance', ascending=False)
 # Print feature importances
 print(importance_df)
 
+# Print tree
+from sklearn.tree import export_graphviz
+import pydotplus
 
-
-
+tree = model.estimators_[0]
+dot_data = export_graphviz(tree, out_file=None, feature_names=X.columns)
+graph = pydotplus.graph_from_dot_data(dot_data)
+graph.write_pdf("/Users/mimi/decision_tree.pdf")
 
 
 
