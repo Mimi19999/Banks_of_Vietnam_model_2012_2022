@@ -20,7 +20,12 @@ Plot 4 indicates that CAR of 5 banks fluctuated and did not show the exact trend
 
 Plot 5 shows the distribution of independent variables. NPL ratio was mostly between 0.00 to 0.03, which complied with the norm ratio of 0.03 and CAR was below 0.02, which was a good ratio. OCR ratio was below 0.04 mostly. GDP and CPi was majorly between 6-8% and 2-4% respectively. 
 
-Correlation matrix shows the correlation between independent variables. It is easy only the significant relationship between NPL and CPI compared to other ones. This was a positive correlation which means these two ratio had the same trend over the period.
+Correlation matrix shows the correlation between independent variables and dependent variable (NIM). There are only two variables which comparatively correlate with NIM: OCR and NPL. OCR has a positive relationshop with NIM while NPL has a negative relationship with NIM. There is a significant relationship between NPL and CPI compared to other ones. This was a positive correlation which means these two ratio had the same trend over the period.
+
+I implement two regressions: Lasso and Random Forest Regression to figure out the relationship between independent variables and dependent variable
+Lasso gave the coefficents which are weak and the overall score or R-squares is only about 25%. MSE indicate is approximately 0 in both training and test data. So, overfitting exists in the model.
+
+
 
 
 

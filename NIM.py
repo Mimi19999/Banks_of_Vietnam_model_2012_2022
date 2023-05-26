@@ -22,9 +22,6 @@ df['OCR'] = df['Operating_cost']/df['Total_asset']
 missing_data = df.isna().sum()
 print(missing_data)
 
-
-
-
 # Pivot table
 pivot_year = pd.pivot_table(df,
                        columns=('Year'),
@@ -38,7 +35,7 @@ pivot_name = pd.pivot_table(df,
                        aggfunc=np.mean)
 print(pivot_name)
 
-# # Plot 1
+# Plot 1
 # # Year_NIM
 # df_summary_year = df[['Year', 'NIM']].groupby('Year').mean()
 # x, y = list(df_summary_year.index), df_summary_year['NIM'].values
@@ -69,7 +66,7 @@ print(pivot_name)
 # plt.title("GDP by year", fontsize=18)
 # plt.show()
 
-# Plot 2
+# # Plot 2
 # name_filter = ['Tech', 'VIB', 'VP', 'Vietcom', 'Vietin']
 
 # # Filter the DataFrame for multiple names
@@ -211,35 +208,58 @@ y = df['NIM']
 idx = np.arange(X.shape[0])
 X_train, X_test, y_train, y_test, idx_train, idx_test = train_test_split(X, y, idx, test_size=0.33, random_state=42)
 
-# # Mark train_data as -1 and mark test_data as 0
-# split_index = [-1 if i in idx_train else 0 for i in idx]
-# ps = PredefinedSplit(test_fold=split_index)
-
-# # Pipeline
-# pipeline = Pipeline([
-#                      ('scaler', StandardScaler()),
-#                      ('model', Lasso())
-# ])
-# # GridSearch
-# search = GridSearchCV(pipeline,
-#                       {'model__alpha':np.arange(1, 10, 1)}, # Tham số alpha từ 1->10 huấn luyện mô hình
-#                       cv = ps, # validation trên tập kiểm tra
-#                       scoring="neg_mean_squared_error", # trung bình tổng bình phương phần dư
-#                       verbose=3
-#                       )
-# search.fit(X, y)
-# print(search.best_estimator_)
-# print('Best core: ', search.best_score_)
-
-# reg_ridge = Lasso(alpha = 1)
-# reg_ridge.fit(X_train, y_train)
-# print(reg_ridge.score(X_train, y_train))
-# print(reg_ridge.coef_)
-# print(reg_ridge.intercept_)
-
-# plt.scatter(x=df['Credit_risk'], y=df["NIM"])
+# # OCR and NIM
+# X_train_df = pd.DataFrame(X_train)
+# OCR_values = X_train_df['OCR'].values
+# print(OCR_values)
+# OCR_index = df.columns.get_loc('OCR')
+# print(OCR_index)
+# print(y_train)
+# plt.scatter(OCR_values, y_train)
+# plt.xlabel('OCR')
+# plt.ylabel('NIM')
+# plt.title('Relationship between NIM and OCR')
 # plt.show()
 
+# Lasso Regression
+# Mark train_data as -1 and mark test_data as 0
+split_index = [-1 if i in idx_train else 0 for i in idx]
+ps = PredefinedSplit(test_fold=split_index)
+
+# Pipeline
+pipeline = Pipeline([
+                     ('scaler', StandardScaler()),
+                     ('model', Lasso())
+])
+# GridSearch
+search = GridSearchCV(pipeline,
+                      {'model__alpha':np.arange(1, 10, 1)}, # Tham số alpha từ 1->10 huấn luyện mô hình
+                      cv = ps, # validation trên tập kiểm tra
+                      scoring="neg_mean_squared_error", # trung bình tổng bình phương phần dư
+                      verbose=3
+                      )
+# Tuning paramaters
+search.fit(X, y)
+print(search.best_estimator_)
+print('Best core: ', search.best_score_)
+
+# Training 
+reg_lasso = Lasso(alpha = 1)
+reg_lasso.fit(X_train, y_train)
+
+y_test_pred = reg_lasso.predict(X_test)
+mse_lasso_test = mean_squared_error(y_test, y_test_pred)
+print("Mean Squared Error of Lasso regression:", mse_lasso_test)
+
+y_train_pred = reg_lasso.predict(X_train)
+mse_lasso_train = mean_squared_error(y_train, y_train_pred)
+print("Mean Squared Error of Lasso regression:", mse_lasso_train)
+
+print(reg_lasso.score(X_train, y_train))
+print(reg_lasso.coef_)
+print(reg_lasso.intercept_)
+
+# Random Forest Regression
 scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
@@ -290,10 +310,10 @@ print(importance_df)
 from sklearn.tree import export_graphviz
 import pydotplus
 
-tree = model.estimators_[0]
-dot_data = export_graphviz(tree, out_file=None, feature_names=X.columns)
-graph = pydotplus.graph_from_dot_data(dot_data)
-graph.write_pdf("/Users/mimi/decision_tree.pdf")
+# tree = model.estimators_[0]
+# dot_data = export_graphviz(tree, out_file=None, feature_names=X.columns)
+# graph = pydotplus.graph_from_dot_data(dot_data)
+# graph.write_pdf("/Users/mimi/decision_tree.pdf")
 
 
 
