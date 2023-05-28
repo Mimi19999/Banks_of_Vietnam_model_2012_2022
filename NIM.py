@@ -315,5 +315,28 @@ import pydotplus
 # graph = pydotplus.graph_from_dot_data(dot_data)
 # graph.write_pdf("/Users/mimi/decision_tree.pdf")
 
+# Split the data into train, validation, and test sets
+X = df[['NPL', 'OCR']]
+X_train_val, X_test, y_train_val, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train, X_val, y_train, y_val = train_test_split(X_train_val, y_train_val, test_size=0.25, random_state=42)
 
+# Initialize the random forest regressor
+rf = RandomForestRegressor(n_estimators= 10, random_state=42)
+
+# Fit the random forest on the training set
+rf.fit(X_train, y_train)
+
+# Evaluate the model on the validation set
+y_val_pred = rf.predict(X_val)
+val_loss = mean_squared_error(y_val, y_val_pred)
+
+# Evaluate the model on the test set (unseen data)
+y_test_pred = rf.predict(X_test)
+test_loss = mean_squared_error(y_test, y_test_pred)
+
+# Result
+r2 = r2_score(y_test, y_test_pred)
+print(r2)
+print("Validation Loss:", val_loss)
+print("Test Loss:", test_loss)
 
