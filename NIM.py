@@ -259,56 +259,53 @@ print(reg_lasso.score(X_train, y_train))
 print(reg_lasso.coef_)
 print(reg_lasso.intercept_)
 
-# Random Forest Regression
-scaler = StandardScaler()
-X_train_scaled = scaler.fit_transform(X_train)
-X_test_scaled = scaler.transform(X_test)
+# # Random Forest Regression
+# scaler = StandardScaler()
+# X_train_scaled = scaler.fit_transform(X_train)
+# X_test_scaled = scaler.transform(X_test)
 
-# Create and train the linear regression model
-model = LinearRegression()
-model.fit(X_train_scaled, y_train)
+# # Create and train the linear regression model
+# model = LinearRegression()
+# model.fit(X_train_scaled, y_train)
 
-# Scale the input for prediction
-X_test_scaled = scaler.transform(X_test)
+# # Scale the input for prediction
+# X_test_scaled = scaler.transform(X_test)
 
-# Make predictions on the test set
-y_pred = model.predict(X_test_scaled)
+# # Make predictions on the test set
+# y_pred = model.predict(X_test_scaled)
 
-# Evaluate the model
-mse = mean_squared_error(y_test, y_pred)
-rmse = np.sqrt(mse)
-r_squared = model.score(X_test_scaled, y_test)
-print(r_squared)
+# # Evaluate the model
+# mse = mean_squared_error(y_test, y_pred)
+# rmse = np.sqrt(mse)
+# r_squared = model.score(X_test_scaled, y_test)
+# print(r_squared)
 
-# Random Forest
-model = RandomForestRegressor(n_estimators=12, random_state=0, max_depth=None, min_samples_split=2)
-model.fit(X_train_scaled, y_train)
+# # Random Forest
+# model = RandomForestRegressor(n_estimators=12, random_state=0, max_depth=None, min_samples_split=2)
+# model.fit(X_train_scaled, y_train)
 
-# Test
-y_pred_test = model.predict(X_test_scaled)
-y_pred_train = model.predict(X_train_scaled)
+# # Test
+# y_pred_test = model.predict(X_test_scaled)
+# y_pred_train = model.predict(X_train_scaled)
 
-# Evaluate
-mse_test = mean_squared_error(y_test, y_pred_test)
-print(mse_test)
-mse_train = mean_squared_error(y_train, y_pred_train)
-print(mse_train)
-r2 = r2_score(y_test, y_pred_test)
-print(r2)
+# # Evaluate
+# mse_test = mean_squared_error(y_test, y_pred_test)
+# print(mse_test)
+# mse_train = mean_squared_error(y_train, y_pred_train)
+# print(mse_train)
+# r2 = r2_score(y_test, y_pred_test)
+# print(r2)
 
-# Get the feature importances
-feature_importances = model.feature_importances_
+# # Get the feature importances
+# feature_importances = model.feature_importances_
 
-# Create a dataframe to display feature importances
-importance_df = pd.DataFrame({'Feature': X.columns, 'Importance': feature_importances})
-importance_df = importance_df.sort_values(by='Importance', ascending=False)
+# # Create a dataframe to display feature importances
+# importance_df = pd.DataFrame({'Feature': X.columns, 'Importance': feature_importances})
+# importance_df = importance_df.sort_values(by='Importance', ascending=False)
 
-# Print feature importances
-print(importance_df)
+# # Print feature importances
+# print(importance_df)
 
-# Print tree
-from sklearn.tree import export_graphviz
-import pydotplus
 
 # tree = model.estimators_[0]
 # dot_data = export_graphviz(tree, out_file=None, feature_names=X.columns)
@@ -319,19 +316,23 @@ import pydotplus
 X = df[['NPL', 'OCR']]
 X_train_val, X_test, y_train_val, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 X_train, X_val, y_train, y_val = train_test_split(X_train_val, y_train_val, test_size=0.25, random_state=42)
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_val_scaled = scaler.fit_transform(X_val)
+X_test_scaled = scaler.transform(X_test)
 
 # Initialize the random forest regressor
 rf = RandomForestRegressor(n_estimators= 10, random_state=42)
 
 # Fit the random forest on the training set
-rf.fit(X_train, y_train)
+rf.fit(X_train_scaled, y_train)
 
 # Evaluate the model on the validation set
-y_val_pred = rf.predict(X_val)
+y_val_pred = rf.predict(X_val_scaled)
 val_loss = mean_squared_error(y_val, y_val_pred)
 
 # Evaluate the model on the test set (unseen data)
-y_test_pred = rf.predict(X_test)
+y_test_pred = rf.predict(X_test_scaled)
 test_loss = mean_squared_error(y_test, y_test_pred)
 
 # Result
@@ -340,3 +341,10 @@ print(r2)
 print("Validation Loss:", val_loss)
 print("Test Loss:", test_loss)
 
+# Print tree
+from sklearn.tree import export_graphviz
+import pydotplus
+# tree = model.estimators_[0]
+# dot_data = export_graphviz(tree, out_file=None, feature_names=X.columns)
+# graph = pydotplus.graph_from_dot_data(dot_data)
+# graph.write_pdf("/Users/mimi/random_forest_tree.pdf")
