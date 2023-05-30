@@ -341,10 +341,11 @@ print(r2)
 print("Validation Loss:", val_loss)
 print("Test Loss:", test_loss)
 
-# Print tree
-from sklearn.tree import export_graphviz
-import pydotplus
-# tree = model.estimators_[0]
+# # Print tree
+# from sklearn.tree import export_graphviz
+# import pydotplus
+# tree = rf.estimators_[0]
 # dot_data = export_graphviz(tree, out_file=None, feature_names=X.columns)
 # graph = pydotplus.graph_from_dot_data(dot_data)
 # graph.write_pdf("/Users/mimi/random_forest_tree.pdf")
+
