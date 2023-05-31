@@ -17,6 +17,7 @@ I collected data from financial statemnets of 14 Vietnam commercial banks over t
 - Correlation matrix between factors and NIM
 - Models: Lasso and Random Forest Tree
 
+
 ## 1. NIM over 11-year period in general 
 
 Pivot table and chart result:
@@ -46,3 +47,5 @@ Correlation matrix shows the correlation between independent variables and depen
 ## 5. Models: Lasso and Random Forest Tree
 
 I implemented two regressions: Lasso and Random Forest Regression to figure out the relationship between independent variables and dependent variable Lasso gave the coefficents which are weak and the overall score or R-squares is only about 25%. MSE indicate is approximately 0 in both training and test data. So, overfitting exists in the model.
+
+Using random forest regression, the importance variables which could affect on the NIM are OCR and NPL.
